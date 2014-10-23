@@ -5,7 +5,9 @@ require 'pogoplug/errors'
 
 module PogoPlug
   module HttpHelper
-
+    
+    DEFAULT_REQUEST_HEADERS = {}
+    
     class HttpError < StandardError
 
       attr_reader :original
@@ -27,7 +29,7 @@ module PogoPlug
     end
 
     def self.create(domain, logger = nil)
-      Faraday.new(:url => domain) do |f|
+      Faraday.new(:url => domain, :headers => DEFAULT_REQUEST_HEADERS ) do |f|
         f.request :url_encoded
         if logger
           f.request :curl, logger, :warn
@@ -52,6 +54,7 @@ module PogoPlug
     def self.send_file(files_url, token, device_id, service_id, file_handle, io, logger = nil)
       uri = URI.parse("#{files_url}/#{token}/#{device_id}/#{service_id}/#{file_handle.id}")
       req = Net::HTTP::Put.new(uri.path)
+      DEFAULT_REQUEST_HEADERS.each{|k,v| req[k] = v }
       req['Content-Length'] = io.size
       req['Content-Type'] = file_handle.mimetype
 
