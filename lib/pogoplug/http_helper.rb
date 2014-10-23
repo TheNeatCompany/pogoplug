@@ -5,6 +5,8 @@ require 'pogoplug/errors'
 
 module PogoPlug
   module HttpHelper
+    
+    DEFAULT_USER_AGENT = 'Neat/Faraday v0.9.0'
 
     class HttpError < StandardError
 
@@ -27,7 +29,7 @@ module PogoPlug
     end
 
     def self.create(domain, logger = nil)
-      Faraday.new(:url => domain) do |f|
+      Faraday.new(:url => domain, :headers => { "User-Agent" => DEFAULT_USER_AGENT } ) do |f|
         f.request :url_encoded
         if logger
           f.request :curl, logger, :warn
@@ -54,6 +56,7 @@ module PogoPlug
       req = Net::HTTP::Put.new(uri.path)
       req['Content-Length'] = io.size
       req['Content-Type'] = file_handle.mimetype
+      req['User-Agent'] = DEFAULT_USER_AGENT
 
       logger_block = lambda do |message|
         logger.info(message) if logger
