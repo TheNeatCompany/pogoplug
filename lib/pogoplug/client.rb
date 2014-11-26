@@ -58,6 +58,20 @@ module PogoPlug
       services
     end
 
+    def signout_url(callback_url)
+      query_params = {
+        :client_id => self.client_id
+      }
+
+      query = ""
+      query_params.each { |k,v| query += "#{k}=#{URI::encode(v)}&" }
+      
+      # callback_url can't be encoded because the pogoplug api doesn't understand URL encoded params
+      query << "redirect_uri=#{callback_url}"
+
+      build_uri("/signout", query)
+    end
+
     def redirect_url(callback_url)
       query = {
         :client_id => self.client_id,

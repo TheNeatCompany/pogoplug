@@ -68,5 +68,14 @@ describe PogoPlug::Client do
 
   end
 
+  context 'build url' do
+    it "should provide a correct signout url for a given callback url" do
+      callback_url = "https://cloud.neat.com/users/sign_out"
+      @client.client_id = "some_client_id"
+      signout_url = @client.signout_url callback_url
+      expect(signout_url).to eq("#{@client.api_domain}signout?client_id=#{@client.client_id}&redirect_uri=#{callback_url}")
+    end
+  end
+
 end
 
