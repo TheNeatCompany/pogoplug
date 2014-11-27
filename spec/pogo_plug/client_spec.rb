@@ -68,5 +68,31 @@ describe PogoPlug::Client do
 
   end
 
+  context 'build url' do
+    before(:each) do
+      @client_id = "some_client_id"
+      String.any_instance.stub(:to_query).with(:client_id) { "#{:client_id}=#{@client_id}" }
+      String.any_instance.stub(:to_query).with(:response_type) { "#{:response_type}=code" }
+    end
+
+    it "should provide a correct signout url for a given callback url" do
+      callback_url = "https://cloud.neat.com/users/sign_out"
+      @client.client_id = @client_id
+      signout_url = @client.signout_url callback_url
+      expect(signout_url).to eq("#{@client.api_domain}signout?client_id=#{@client.client_id}&redirect_uri=#{callback_url}")
+    end
+
+    it "should provide a correct signin url for a given callback url" do
+      callback_url = "https://cloud.neat.com/users/sign_in"
+      @client.client_id = @client_id
+      # test new method
+      signin_url = @client.signin_url callback_url
+      expect(signin_url).to eq("#{@client.api_domain}oauth?client_id=#{@client.client_id}&response_type=code&redirect_uri=#{callback_url}")
+      # test old method until it's deprecated
+      signin_url = @client.redirect_url callback_url
+      expect(signin_url).to eq("#{@client.api_domain}oauth?client_id=#{@client.client_id}&response_type=code&redirect_uri=#{callback_url}")
+    end
+  end
+
 end
 
