@@ -1,4 +1,4 @@
-require 'open-uri'
+require 'open-uri' 
 require 'pogoplug/api_version'
 require 'pogoplug/device'
 require 'pogoplug/http_helper'
@@ -59,31 +59,17 @@ module PogoPlug
     end
 
     def signout_url(callback_url)
-      query_params = {
-        :client_id => self.client_id
-      }
-
-      query = ""
-      query_params.each { |k,v| query += "#{k}=#{URI::encode(v)}&" }
-      
-      # callback_url can't be encoded because the pogoplug api doesn't understand URL encoded params
-      query << "redirect_uri=#{callback_url}"
-
-      build_uri("/signout", query)
+      generate_redirect_url("/signout", {:client_id => self.client_id}, callback_url)
     end
 
+    def signin_url(callback_url)
+      generate_redirect_url("/oauth", {:client_id => self.client_id, :response_type => 'code'}, callback_url)
+    end
+
+    # below method should be deprecated and removed since the name
+    # 'redirect_url' does not clearly indicate what is being returned.
     def redirect_url(callback_url)
-      query = {
-        :client_id => self.client_id,
-        :response_type => 'code',
-        #:redirect_uri => callback_url # doesn't work because the api doesn't understand URL encoded params
-      }.map do |key, value|
-        value.to_query(key)
-      end * '&'
-
-      query << "&redirect_uri=#{callback_url}"
-
-      build_uri("/oauth", query)
+      signin_url(callback_url)
     end
 
     def get_access_token(access_code)
@@ -127,6 +113,15 @@ module PogoPlug
 
     def uri
       @uri ||= URI(@api_domain)
+    end
+
+    def generate_redirect_url(path, query_params, callback_url)
+      query = query_params.map do |key, value|
+        value.to_query(key)
+      end * '&'
+
+      query << "&redirect_uri=#{callback_url}"
+      build_uri(path, query)
     end
 
     def build_uri(path, query_params)
