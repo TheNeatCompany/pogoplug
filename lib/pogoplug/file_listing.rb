@@ -24,9 +24,9 @@ module PogoPlug
         total_count: json['totalcount'].to_i
       )
       if json['files'].kind_of?(Array)
-        json['files'].each do |f|
-          listing.files << File.from_json(f)
-        end
+        listing.files = json['files'].map do |f|
+          File.from_json(f)
+        end.sort_by { |f| f.size }
       end
       listing
     end
