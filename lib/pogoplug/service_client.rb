@@ -114,17 +114,22 @@ module PogoPlug
       get('/updateFile', params)
     end
 
-    def download(file)
+    def download(file, timeout)
       raise DirectoriesCanNotBeDownloaded.new(file.inspect) unless file.file?
 
       execute do |request, headers|
-        request.get("/svc/files/#{@device_id}/#{@service_id}/#{file.id}/dl", {}, headers)
+        request.get do |req|
+          req.url "/svc/files/#{@device_id}/#{@service_id}/#{file.id}/dl"
+          req.headers.merge!(headers)
+          req.options.timeout = timeout
+          req.options.open_timeout = timeout
+        end
       end.body
     end
 
-    def download_to(file, destination)
+    def download_to(file, destination, timeout = 300)
       ::File.open(destination, 'wb') do |f|
-        f.write(download(file))
+        f.write(download(file, timeout))
       end
     end
 
