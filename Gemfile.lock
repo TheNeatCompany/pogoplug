@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     pogoplug (0.3.0)
+      excon
       faraday (>= 0.9.0)
       faraday_curl (>= 0.0.2)
       faraday_middleware
@@ -13,11 +14,12 @@ GEM
       timers (~> 1.1.0)
     coderay (1.1.0)
     diff-lcs (1.2.5)
-    faraday (0.9.0)
+    excon (0.45.4)
+    faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
     faraday_curl (0.0.2)
       faraday (>= 0.9.0)
-    faraday_middleware (0.9.1)
+    faraday_middleware (0.10.0)
       faraday (>= 0.7.4, < 0.10)
     ffi (1.9.3)
     ffi (1.9.3-java)
