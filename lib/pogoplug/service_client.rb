@@ -143,7 +143,7 @@ module PogoPlug
         connection = Excon.new("#{host}#{path}", expects: [200, 201], idempotent: true, connect_timeout: timeout)
         headers = { 'cookie' => "valtoken=#{@token}" }
 
-        streamer = lambda do |chunk|
+        streamer = lambda do |chunk, remaining_bytes, total_bytes|
           f.write chunk
         end
 
