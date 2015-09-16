@@ -137,10 +137,8 @@ module PogoPlug
       raise DirectoriesCanNotBeDownloaded.new(file.inspect) unless file.file?
 
       ::File.open(destination, 'wb') do |f|
-        host = "#{@uri.scheme}://#{@uri.host}"
-        path = "/svc/files/#{@device_id}/#{@service_id}/#{file.id}/dl"
 
-        connection = Excon.new("#{host}#{path}", expects: [200, 201], idempotent: true, connect_timeout: timeout)
+        connection = Excon.new(download_from_device_url(file), expects: [200, 201], idempotent: true, connect_timeout: timeout)
         headers = { 'cookie' => "valtoken=#{@token}" }
 
         streamer = lambda do |chunk, remaining_bytes, total_bytes|
@@ -149,6 +147,12 @@ module PogoPlug
 
         connection.get(headers: headers, response_block: streamer)
       end
+    end
+
+    def download_from_device_url(file)
+      host = "#{@uri.scheme}://#{@uri.host}"
+      path = "/svc/files/#{@device_id}/#{@service_id}/#{file.id}/dl"
+      "#{host}#{path}"
     end
 
     def find_by_id!(id)
