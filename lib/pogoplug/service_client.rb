@@ -144,8 +144,8 @@ module PogoPlug
         streamer = lambda do |chunk, remaining_bytes, total_bytes|
           f.write chunk
         end
-
-        connection.get(headers: headers, response_block: streamer)
+        io_timeout = { write_timeout: timeout, read_timeout: timeout }
+        connection.get(io_timeout.merge(headers: headers, response_block: streamer))
       end
     end
 
